@@ -1,0 +1,11 @@
+# Ignore compiled class files
+*.class
+
+# Ignore build output directory
+/out
+
+# Ignore logs
+*.log
+
+# macOS system files
+.DS_Store
