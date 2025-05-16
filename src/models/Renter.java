@@ -1,3 +1,4 @@
+package models;
 public class Renter extends user {
     public Renter(String username, String password, String city) {
         super(username, password, city);
