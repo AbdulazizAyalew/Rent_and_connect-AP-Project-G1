@@ -16,6 +16,7 @@ Rent & Connect is a Java-based application that streamlines the rental process b
 
 ## 📁 Project Structure
 
+/src
 ├── Renter.java
 ├── Lender.java
 ├── HouseListing.java
