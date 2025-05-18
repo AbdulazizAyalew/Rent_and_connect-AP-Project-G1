@@ -16,10 +16,10 @@ public class DatabaseInitializer {
     try (Connection dbConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/rent_connect", "root", "12345678")) {
         Statement dbStmt = dbConn.createStatement();
 
-        dbStmt.executeUpdate("CREATE TABLE IF NOT EXISTS renters (id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(100), email VARCHAR(100))");
-        dbStmt.executeUpdate("CREATE TABLE IF NOT EXISTS lenders (id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(100), email VARCHAR(100))");
-        dbStmt.executeUpdate("CREATE TABLE IF NOT EXISTS house_listings (id INT PRIMARY KEY AUTO_INCREMENT, title VARCHAR(100), description TEXT, lender_id INT)");
-        dbStmt.executeUpdate("CREATE TABLE IF NOT EXISTS messages (id INT PRIMARY KEY AUTO_INCREMENT, sender_id INT, receiver_id INT, content TEXT)");
+        dbStmt.executeUpdate("CREATE TABLE IF NOT EXISTS renters (id INT PRIMARY KEY AUTO_INCREMENT, username VARCHAR(100), email VARCHAR(100),phone_no VARCHAR(15),password VARCHAR(255), city VARCHAR(100))");
+        dbStmt.executeUpdate("CREATE TABLE IF NOT EXISTS lenders (id INT PRIMARY KEY AUTO_INCREMENT, username VARCHAR(100), email VARCHAR(100),password VARCHAR(255),city VARCHAR(100))");
+        dbStmt.executeUpdate("CREATE TABLE IF NOT EXISTS house_listings (id INT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(100), description TEXT,house_type VARCHAR(50),location VARCHAR(255),price DECIMAL(10,2), lender_id INT,FOREIGN KEY (lender_id) REFERENCES lenders(id) ON DELETE CASCADE,availability BOOLEAN)");
+        dbStmt.executeUpdate("CREATE TABLE IF NOT EXISTS messages (id INT PRIMARY KEY AUTO_INCREMENT, sender VARCHAR(50), receiver_id INT, content TEXT,sent_at DATETIME DEFAULT CURRENT_TIMESTAMP)");
 
         System.out.println("✅ Database and tables created successfully!");
     }
@@ -30,3 +30,4 @@ public class DatabaseInitializer {
 
     }
 }
+
