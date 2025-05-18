@@ -1,46 +1,40 @@
 package services;
 
+import dao.UserDAO;
 import models.Lender;
 import models.Renter;
-import models.user;
-import java.util.ArrayList;
-import java.util.Optional;
+
+import java.sql.SQLException;
+import java.util.List;
 
 public class UserService {
-    private ArrayList<Renter> renters = new ArrayList<>();
-    private ArrayList<Lender> lenders = new ArrayList<>();
+    private UserDAO userDAO;
 
-    public boolean registerRenter(String username, String password, String city) {
-        renters.add(new Renter(username, password, city));
-        return true;
+    public UserService() throws SQLException {
+        userDAO = new UserDAO();
     }
 
-    public boolean registerLender(String username, String password, String city) {
-        lenders.add(new Lender(username, password, city));
-        return true;
+    public Boolean registerRenter(Renter renter) throws SQLException {
+        return userDAO.insertRenter(renter);
     }
 
-    public Optional<user> login(String username, String password) {
-        for (Renter r : renters) {
-            if (r.getUsername().equals(username) && r.getPassword().equals(password)) {
-                return Optional.of(r);
-            }
-        }
-
-        for (Lender l : lenders) {
-            if (l.getUsername().equals(username) && l.getPassword().equals(password)) {
-                return Optional.of(l);
-            }
-        }
-
-        return Optional.empty(); // Login failed
+    public Boolean registerLender(Lender lender) throws SQLException {
+        return userDAO.insertLender(lender);
     }
 
-    public ArrayList<Renter> getRenters() {
-        return renters;
+    public Renter loginRenter(String username,String password) throws SQLException {
+        return userDAO.findRenterByUsername(username,password);
     }
 
-    public ArrayList<Lender> getLenders() {
-        return lenders;
+    public Lender loginLender(String username, String password) throws SQLException {
+        return userDAO.findLenderByUsername(username,password);
+    }
+
+    public List<Renter> getAllRenters() throws SQLException {
+        return userDAO.getAllRenters();
+    }
+
+    public List<Lender> getAllLenders() throws SQLException {
+        return userDAO.getAllLenders();
     }
 }
