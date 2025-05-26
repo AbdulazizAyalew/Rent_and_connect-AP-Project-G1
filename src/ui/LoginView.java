@@ -1,85 +1,112 @@
 package ui;
 
+import services.UserService;
 import models.Renter;
 import models.Lender;
-import services.UserService;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.sql.SQLException;
-import java.util.Scanner;
 
-public class LoginView  {
-    
-    public LoginView() throws SQLException{
+public class LoginView extends JFrame {
+    private JTextField usernameField;
+    private JPasswordField passwordField;
+    private JComboBox<String> roleBox;
 
+    public LoginView() throws SQLException {
+        setTitle("Login Page");
+        setSize(1000, 500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createTitledBorder("Login"));
+        panel.setBackground(Color.WHITE);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+
+        int row = 0;
+
+        panel.add(createLabel("Username:"), gbcLabel(gbc, 0, row));
+        usernameField = new JTextField(15);
+        panel.add(usernameField, gbcField(gbc, 1, row++));
+
+        panel.add(createLabel("Password:"), gbcLabel(gbc, 0, row));
+        passwordField = new JPasswordField(15);
+        panel.add(passwordField, gbcField(gbc, 1, row++));
+
+        panel.add(createLabel("Role:"), gbcLabel(gbc, 0, row));
+        roleBox = new JComboBox<>(new String[]{"Renter", "Lender"});
+        panel.add(roleBox, gbcField(gbc, 1, row++));
+
+        JButton loginBtn = new JButton("Login");
+        panel.add(loginBtn, gbcField(gbc, 0, row));
+
+        JButton backBtn = new JButton("Back");
+        panel.add(backBtn, gbcField(gbc, 1, row));
+
+        add(panel);
+
+        // Login Action
+        loginBtn.addActionListener((ActionEvent e) -> {
+            String username = usernameField.getText();
+            String password = new String(passwordField.getPassword());
+            String role = (String) roleBox.getSelectedItem();
+
+            try {
+                if (role.equals("Renter")) {
+                    UserService renterService = new UserService();
+                    Renter renter = renterService.loginRenter(username, password);
+                    if (renter != null) {
+                        JOptionPane.showMessageDialog(this, "Welcome, " + renter.getUsername());
+                        new RenterDashboard(renter); // Optional future GUI
+                        dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Invalid renter credentials!");
+                    }
+                } else {
+                    UserService lenderService = new UserService();
+                    Lender lender = lenderService.loginLender(username, password);
+                    if (lender != null) {
+                        JOptionPane.showMessageDialog(this, "Welcome, " + lender.getUsername());
+                        new LenderDashboard(lender); // Optional future GUI
+                        dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Invalid lender credentials!");
+                    }
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Login error: " + ex.getMessage());
+            }
+        });
+
+        backBtn.addActionListener(e -> {
+            new MainMenu();
+            dispose();
+        });
+
+        setVisible(true);
+    }
+    private JLabel createLabel(String text) {
+        return new JLabel(text);
     }
 
-    private final Scanner scanner = new Scanner(System.in);
-    private final UserService userService = new UserService(); 
-
-    public void show() {
-        System.out.println("\n===== LOGIN =====");
-        System.out.println("[1] Login as Renter");
-        System.out.println("[2] Login as Lender");
-        System.out.print("➤ Choose account type: ");
-
-        String choice = scanner.nextLine();
-
-        switch (choice) {
-            case "1":
-                login_Renter();
-                break;
-            case "2":
-                login_lender();
-                break;
-            default:
-                System.out.println("❌ Invalid choice. Please try again.");
-        }
-
+    private GridBagConstraints gbcLabel(GridBagConstraints gbc, int x, int y) {
+        GridBagConstraints c = (GridBagConstraints) gbc.clone();
+        c.gridx = x;
+        c.gridy = y;
+        return c;
     }
-        private void login_Renter() {
 
-            System.out.println("\n===== LOGIN =====");
-            System.out.print("➤ Username: ");
-            String username = scanner.nextLine();
-
-            System.out.print("➤ Password: ");
-            String password = scanner.nextLine();
-            try {
-                Renter renter = userService.loginRenter(username, password);
-                if (renter != null) {
-                    System.out.println("✅ Login successful!");
-                    RenterDashboard dashboard = new RenterDashboard(renter);
-                    dashboard.showMenu();
-                }
-                else {
-                System.out.println("❌ Invalid credentials. Please try again.");
-                }
-            } catch (SQLException e) {
-                
-            }
-        }
-
-        private void login_lender() {
-
-            System.out.println("\n===== LOGIN =====");
-            System.out.print("➤ Username: ");
-            String l_username = scanner.nextLine();
-
-            System.out.print("➤ Password: ");
-            String l_password = scanner.nextLine();
-            try {
-                Lender lender = userService.loginLender(l_username, l_password);
-                if (lender != null) {
-                    System.out.println("✅ Login successful!");
-                    LenderDashboard dashboard = new LenderDashboard(lender);
-                    dashboard.showMenu();
-                }
-                else {
-                System.out.println("❌ Invalid credentials. Please try again.");
-                }
-            } catch (SQLException e) {
-                
-            }
-        }
+    private GridBagConstraints gbcField(GridBagConstraints gbc, int x, int y) {
+        GridBagConstraints c = (GridBagConstraints) gbc.clone();
+        c.gridx = x;
+        c.gridy = y;
+        return c;
+    }
 
 }
