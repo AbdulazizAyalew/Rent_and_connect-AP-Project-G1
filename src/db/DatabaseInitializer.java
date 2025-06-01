@@ -13,7 +13,7 @@ public class DatabaseInitializer {
     stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS rent_connect");
 
     // Now connect to that DB and create tables
-    try (Connection dbConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/rent_connect", "root", "12345678")) {
+    try (Connection dbConn = DriverManager.getConnection("jdbc:mysql://localhost:3307/rent_connect", "root", "12345678")) {
         Statement dbStmt = dbConn.createStatement();
 
         dbStmt.executeUpdate("CREATE TABLE IF NOT EXISTS renters (renter_id INT PRIMARY KEY AUTO_INCREMENT, username VARCHAR(100), password VARCHAR(255), city VARCHAR(100), registration_day DATETIME DEFAULT CURRENT_TIMESTAMP)");

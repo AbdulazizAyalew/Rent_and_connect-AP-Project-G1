@@ -1,38 +1,25 @@
 package services;
 
-import models.*;
-import java.util.ArrayList;
+import dao.HouseDAO;
+import java.sql.SQLException;
+import java.util.List;
+import models.HouseListing;
 
 public class HouseService {
-    private ArrayList<HouseListing> listings = new ArrayList<>();
-    private int nextListingId = 1;
 
-    public HouseListing addHouse(String location, String type, double price, int bedrooms, boolean available) {
-        HouseListing house = new HouseListing(nextListingId++, location, type, price, bedrooms, available);
-        listings.add(house);
-        return house;
+    private HouseDAO houseDAO;
+ 
+    public HouseService() throws SQLException {
+        houseDAO = new HouseDAO();
+    }   
+
+    public Boolean addHouse(HouseListing house) throws SQLException {
+        return houseDAO.addHouseListing(house);
     }
 
-    public ArrayList<HouseListing> searchByCityAndMaxPrice(String city, double maxPrice) {
-        ArrayList<HouseListing> results = new ArrayList<>();
-        for (HouseListing h : listings) {
-            if (h.getLocation().equalsIgnoreCase(city) && h.getPrice() <= maxPrice && h.isAvailable()) {
-                results.add(h);
-            }
-        }
-        return results;
+    public List<HouseListing> getAllAvailableHouses() throws SQLException {
+        return houseDAO.getAllHouses();
     }
 
-    public ArrayList<HouseListing> getAllListings() {
-        return listings;
-    }
-
-    public HouseListing getById(int id) {
-        for (HouseListing h : listings) {
-            if (h.getListingId() == id) {
-                return h;
-            }
-        }
-        return null;
-    }
+    
 }

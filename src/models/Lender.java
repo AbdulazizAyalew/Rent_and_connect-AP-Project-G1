@@ -1,7 +1,7 @@
 package models;
 public class Lender extends user {
-    public Lender(String username, String password, String city) {
-        super(username, password, city);
+    public Lender(String username, String city, String password) {
+        super(username, city, password);
     }
 
     @Override

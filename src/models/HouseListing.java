@@ -1,24 +1,44 @@
 package models;
+
+import java.math.BigDecimal;
+
 public class HouseListing {
     private int listingId;
+    private int lender_id;
+    private String title;
+    private String description;
     private String location;
     private String houseType;
-    private double price;
-    private int bedrooms;
+    private BigDecimal price;
     private boolean available;
 
     // Constructor, Getters, Setters
     // ✅ Constructor
-    public HouseListing(int listingId, String location, String houseType, double price, int bedrooms, boolean available) {
-        this.listingId = listingId;
+    public HouseListing(){
+
+    }
+    public HouseListing(String title, String description, String houseType,  String location,  BigDecimal price, boolean available) {
+        this.title = title;
+        this.description = description;
         this.location = location;
         this.houseType = houseType;
         this.price = price;
-        this.bedrooms = bedrooms;
         this.available = available;
     }
 
     // ✅ Getters
+    public String getListingTitle(){
+        return title;
+    }
+    
+    public String getListingDescription(){
+        return description;
+    }
+    
+    public int getLenderId(){
+        return lender_id;
+    }
+
     public int getListingId() {
         return listingId;
     }
@@ -31,19 +51,26 @@ public class HouseListing {
         return houseType;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public int getBedrooms() {
-        return bedrooms;
-    }
 
     public boolean isAvailable() {
         return available;
     }
+    
 
     // ✅ Setters
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description){
+        this.description = description;
+    }
+
     public void setLocation(String location) {
         this.location = location;
     }
@@ -52,15 +79,15 @@ public class HouseListing {
         this.houseType = houseType;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
-    public void setBedrooms(int bedrooms) {
-        this.bedrooms = bedrooms;
-    }
 
     public void setAvailable(boolean available) {
         this.available = available;
+    }
+    public void setLenderId(int id){
+        this.lender_id = id;
     }
 }

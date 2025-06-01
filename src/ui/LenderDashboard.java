@@ -1,126 +1,206 @@
 package ui;
 
-import models.HouseListing;
 import models.Lender;
+
+import javax.swing.*;
+import java.awt.*;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+
 import services.HouseService;
+import models.HouseListing;
 
-import java.util.ArrayList;
-import java.util.Scanner;
-
-public class LenderDashboard {
+public class LenderDashboard extends JFrame {
 
     private final Lender lender;
-    private final Scanner scanner = new Scanner(System.in);
-    private final HouseService houseService = new HouseService(); // Should be passed in ideally
 
-    public LenderDashboard(Lender lender) {
-        this.lender = lender;
-    }
+   public LenderDashboard(Lender lender) {
+    this.lender = lender;
 
-    public void show() {
-        while (true) {
-            System.out.println("\n===== LENDER DASHBOARD =====");
-            System.out.println("[1] Add a new house");
-            System.out.println("[2] View all listings");
-            System.out.println("[3] Update a listing");
-            System.out.println("[4] Logout");
+    setTitle("Lender Dashboard");
+    setSize(500, 300);
+    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    setLocationRelativeTo(null);
+    getContentPane().setBackground(Color.WHITE); // cleaner background
 
-            System.out.print("➤ Choose an option: ");
-            String choice = scanner.nextLine();
+    // === Main container ===
+    JPanel container = new JPanel();
+    container.setLayout(new BorderLayout(20, 20));
+    container.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
+    container.setBackground(Color.WHITE);
 
-            switch (choice) {
-                case "1":
-                    addNewHouse();
-                    break;
-                case "2":
-                    viewAllListings();
-                    break;
-                case "3":
-                    updateHouse();
-                    break;
-                case "4":
-                    System.out.println("✅ Logged out.");
-                    return;
-                default:
-                    System.out.println("❌ Invalid choice.");
+    // === Welcome Section ===
+    JLabel welcomeLabel = new JLabel("Welcome, " + lender.getUsername() + "!");
+    welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
+    welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    welcomeLabel.setForeground(new Color(33, 37, 41));
+
+    JLabel subLabel = new JLabel("What would you like to do today?");
+    subLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+    subLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    subLabel.setForeground(new Color(85, 85, 85));
+
+    JPanel welcomePanel = new JPanel(new GridLayout(2, 1, 5, 5));
+    welcomePanel.setBackground(Color.WHITE);
+    welcomePanel.add(welcomeLabel);
+    welcomePanel.add(subLabel);
+
+    // === Button Panel ===
+    JButton addListingButton = new JButton("  Add New House Listing");
+    JButton logoutButton = new JButton("Exit");
+
+    Font btnFont = new Font("Segoe UI", Font.PLAIN, 16);
+    addListingButton.setFont(btnFont);
+    logoutButton.setFont(btnFont);
+
+    addListingButton.setFocusPainted(false);
+    logoutButton.setFocusPainted(false);
+
+    JPanel buttonPanel = new JPanel(new GridLayout(2, 1, 15, 15));
+    buttonPanel.setBackground(Color.WHITE);
+    buttonPanel.add(addListingButton);
+    buttonPanel.add(logoutButton);
+
+    // === Combine Panels ===
+    container.add(welcomePanel, BorderLayout.NORTH);
+    container.add(buttonPanel, BorderLayout.CENTER);
+
+    add(container);
+
+    // === Logic remains unchanged ===
+    addListingButton.addActionListener(e -> showAddHouseListingForm());
+    logoutButton.addActionListener(e -> {
+        new MainMenu();
+        dispose();
+    });
+
+    setVisible(true);
+}
+
+
+   private void showAddHouseListingForm() {
+    JDialog dialog = new JDialog(this, "Add House Listing", true);
+    dialog.setSize(500, 600); // increased height for description field
+    dialog.setLocationRelativeTo(this);
+    dialog.setLayout(new BorderLayout(10, 10));
+
+    JLabel headerLabel = new JLabel("Add New House Listing", SwingConstants.CENTER);
+    headerLabel.setFont(new Font("Arial", Font.BOLD, 18));
+    headerLabel.setBorder(BorderFactory.createEmptyBorder(15, 0, 5, 0));
+    dialog.add(headerLabel, BorderLayout.NORTH);
+
+    JPanel formPanel = new JPanel(new GridBagLayout());
+    formPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.insets = new Insets(10, 10, 10, 10);
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+
+    JLabel titleLabel = new JLabel("Title:");
+    JTextField titleField = new JTextField(20);
+
+    JLabel locationLabel = new JLabel("City:");
+    JComboBox<String> locationCombo = new JComboBox<>(new String[]{
+        "Addis Ababa", "Bole", "Lafto", "Jemo", "Gullele",
+        "Kirkos", "Yeka", "Arada", "Nifas Silk", "Akaki Kality"
+    });
+
+    JLabel typeLabel = new JLabel("Type:");
+    JComboBox<String> typeCombo = new JComboBox<>(new String[]{
+        "Condo", "Apartment", "Villa", "Duplex", "Studio"
+    });
+
+    JLabel priceLabel = new JLabel("Price (ETB):");
+    NumberFormat priceFormat = NumberFormat.getNumberInstance();
+    priceFormat.setGroupingUsed(false);
+    JFormattedTextField priceField = new JFormattedTextField(priceFormat);
+    priceField.setColumns(20);
+
+    JLabel availableLabel = new JLabel("Available:");
+    JCheckBox availableCheck = new JCheckBox();
+
+    JLabel descriptionLabel = new JLabel("Description:");
+    JTextArea descriptionArea = new JTextArea(4, 20);
+    descriptionArea.setLineWrap(true);
+    descriptionArea.setWrapStyleWord(true);
+    JScrollPane descriptionScroll = new JScrollPane(descriptionArea);
+
+    // === Add components row by row ===
+    int row = 0;
+
+    gbc.gridx = 0;
+    gbc.gridy = row;
+    formPanel.add(titleLabel, gbc);
+    gbc.gridx = 1;
+    formPanel.add(titleField, gbc);
+
+    gbc.gridx = 0;
+    gbc.gridy = ++row;
+    formPanel.add(locationLabel, gbc);
+    gbc.gridx = 1;
+    formPanel.add(locationCombo, gbc);
+
+    gbc.gridx = 0;
+    gbc.gridy = ++row;
+    formPanel.add(typeLabel, gbc);
+    gbc.gridx = 1;
+    formPanel.add(typeCombo, gbc);
+
+    gbc.gridx = 0;
+    gbc.gridy = ++row;
+    formPanel.add(priceLabel, gbc);
+    gbc.gridx = 1;
+    formPanel.add(priceField, gbc);
+
+    gbc.gridx = 0;
+    gbc.gridy = ++row;
+    formPanel.add(availableLabel, gbc);
+    gbc.gridx = 1;
+    formPanel.add(availableCheck, gbc);
+
+    gbc.gridx = 0;
+    gbc.gridy = ++row;
+    gbc.anchor = GridBagConstraints.NORTH;
+    formPanel.add(descriptionLabel, gbc);
+    gbc.gridx = 1;
+    formPanel.add(descriptionScroll, gbc);
+    gbc.anchor = GridBagConstraints.CENTER;
+
+    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    JButton saveButton = new JButton("Save");
+    JButton cancelButton = new JButton("Cancel");
+    buttonPanel.add(cancelButton);
+    buttonPanel.add(saveButton);
+
+    saveButton.addActionListener(e -> {
+        try {
+            HouseListing house = new HouseListing();
+            house.setTitle(titleField.getText().trim());
+            house.setLocation((String) locationCombo.getSelectedItem());
+            house.setHouseType((String) typeCombo.getSelectedItem());
+
+            String priceText = priceField.getText().trim();
+            if (!priceText.isEmpty()) {
+                house.setPrice(new BigDecimal(priceText));
             }
+
+            house.setAvailable(availableCheck.isSelected());
+            house.setDescription(descriptionArea.getText().trim());
+
+            boolean success = new HouseService().addHouse(house);
+            JOptionPane.showMessageDialog(dialog, success
+                    ? "House listing added successfully!"
+                    : "Failed to add house listing.");
+            if (success) dialog.dispose();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(dialog, "Error: " + ex.getMessage());
         }
-    }
+    });
 
-    private void addNewHouse() {
-        System.out.print("Location: ");
-        String location = scanner.nextLine();
+    cancelButton.addActionListener(e -> dialog.dispose());
 
-        System.out.print("Type (apartment, condo, etc.): ");
-        String type = scanner.nextLine();
+    dialog.add(formPanel, BorderLayout.CENTER);
+    dialog.add(buttonPanel, BorderLayout.SOUTH);
+    dialog.setVisible(true);
+}
 
-        System.out.print("Price: ");
-        double price = Double.parseDouble(scanner.nextLine());
-
-        System.out.print("Number of bedrooms: ");
-        int bedrooms = Integer.parseInt(scanner.nextLine());
-
-        System.out.print("Available (true/false): ");
-        boolean available = Boolean.parseBoolean(scanner.nextLine());
-
-        HouseListing house = houseService.addHouse(location, type, price, bedrooms, available);
-        System.out.println("✅ House added with ID: " + house.getListingId());
-    }
-
-    private void viewAllListings() {
-        ArrayList<HouseListing> listings = houseService.getAllListings();
-
-        if (listings.isEmpty()) {
-            System.out.println("No listings yet.");
-            return;
-        }
-
-        for (HouseListing house : listings) {
-            displayHouse(house);
-        }
-    }
-
-    private void updateHouse() {
-        System.out.print("Enter the ID of the listing to update: ");
-        int id = Integer.parseInt(scanner.nextLine());
-
-        HouseListing house = houseService.getById(id);
-        if (house == null) {
-            System.out.println("❌ No listing found with ID " + id);
-            return;
-        }
-
-        System.out.println("Leave field blank to keep current value.");
-        System.out.print("New Location (" + house.getLocation() + "): ");
-        String location = scanner.nextLine();
-        if (!location.isEmpty()) house.setLocation(location);
-
-        System.out.print("New Type (" + house.getHouseType() + "): ");
-        String type = scanner.nextLine();
-        if (!type.isEmpty()) house.setHouseType(type);
-
-        System.out.print("New Price (" + house.getPrice() + "): ");
-        String priceInput = scanner.nextLine();
-        if (!priceInput.isEmpty()) house.setPrice(Double.parseDouble(priceInput));
-
-        System.out.print("New Bedrooms (" + house.getBedrooms() + "): ");
-        String bedInput = scanner.nextLine();
-        if (!bedInput.isEmpty()) house.setBedrooms(Integer.parseInt(bedInput));
-
-        System.out.print("Is Available? (" + house.isAvailable() + "): ");
-        String availInput = scanner.nextLine();
-        if (!availInput.isEmpty()) house.setAvailable(Boolean.parseBoolean(availInput));
-
-        System.out.println("✅ Listing updated!");
-    }
-
-    private void displayHouse(HouseListing house) {
-        System.out.println("ID: " + house.getListingId());
-        System.out.println("Location: " + house.getLocation());
-        System.out.println("Type: " + house.getHouseType());
-        System.out.println("Price: " + house.getPrice());
-        System.out.println("Bedrooms: " + house.getBedrooms());
-        System.out.println("Availability: " + (house.isAvailable() ? "Available" : "Not Available"));
-        System.out.println("------------------------");
-    }
 }

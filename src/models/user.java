@@ -4,7 +4,7 @@ public abstract class user {
     protected String password;
     protected String city;
 
-    public user(String username, String password, String city) {
+    public user(String username, String city, String password) {
         this.username = username;
         this.password = password;
         this.city = city;

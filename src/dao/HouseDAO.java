@@ -8,53 +8,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HouseDAO {
-
+    private Connection conn;
+    public HouseDAO() throws SQLException {
+        conn = DatabaseConnection.getConnection();
+    }
     // Insert a new house listing
-    public void addHouseListing(HouseListing house) {
-        String sql = "INSERT INTO house_listings (title, description, address, price, lender_id) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+    public Boolean addHouseListing(HouseListing house) {
+        String sql = "INSERT INTO house_listings (title, description, location, price, house_type, availability) VALUES (?, ?, ?, ?,?,?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, house.getListingTitle());
             stmt.setString(2, house.getListingDescription());
             stmt.setString(3, house.getLocation());
             stmt.setBigDecimal(4, house.getPrice());
-            stmt.setInt(5, house.getLenderId());
+            stmt.setString(5, house.getHouseType());
+            stmt.setBoolean(6, house.isAvailable());
 
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
+            int row_affected = stmt.executeUpdate();
+        
+            return row_affected > 0;
         }
+        catch(SQLException e){
+
+        }
+        return false;
     }
 
-    // Get house by ID
-    public HouseListing getHouseById(int id) {
-        String sql = "SELECT * FROM house_listings WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                HouseListing house = new HouseListing(
-                    rs.getInt("id"),
-                    rs.getInt("lender_id"),
-                    rs.getString("title"),
-                    rs.getString("description"),
-                    rs.getString("location"),
-                    rs.getString("house_type"),
-                    rs.getBigDecimal("price"),
-                    rs.getBoolean("availability")
-                    
-                );
-                return house;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     // Get all house listings
     public List<HouseListing> getAllHouses() {
@@ -67,12 +46,10 @@ public class HouseDAO {
 
             while (rs.next()) {
                 HouseListing house = new HouseListing(
-                    rs.getInt("id"),
-                    rs.getInt("lender_id"),
                     rs.getString("title"),
                     rs.getString("description"),
-                    rs.getString("location"),
                     rs.getString("house_type"),
+                    rs.getString("location"),
                     rs.getBigDecimal("price"),
                     rs.getBoolean("availability")
                 );
