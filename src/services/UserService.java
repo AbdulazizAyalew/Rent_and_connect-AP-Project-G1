@@ -5,7 +5,6 @@ import models.Lender;
 import models.Renter;
 
 import java.sql.SQLException;
-import java.util.List;
 
 public class UserService {
     private UserDAO userDAO;
@@ -30,11 +29,4 @@ public class UserService {
         return userDAO.findLenderByUsername(username,password);
     }
 
-    public List<Renter> getAllRenters() throws SQLException {
-        return userDAO.getAllRenters();
-    }
-
-    public List<Lender> getAllLenders() throws SQLException {
-        return userDAO.getAllLenders();
-    }
 }
