@@ -5,6 +5,7 @@ import models.Renter;
 import models.Lender;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.sql.SQLException;
@@ -16,12 +17,17 @@ public class LoginView extends JFrame {
 
     public LoginView() throws SQLException {
         setTitle("Login Page");
-        setSize(1000, 500);
+        setSize(800, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createTitledBorder("Login"));
+        panel.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createEtchedBorder(),
+            "Login",
+            TitledBorder.CENTER,
+            TitledBorder.TOP
+        ));
         panel.setBackground(Color.WHITE);
 
         GridBagConstraints gbc = new GridBagConstraints();
