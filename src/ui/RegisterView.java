@@ -1,61 +1,117 @@
 package ui;
 
+import models.Renter;
+import models.Lender;
 import services.UserService;
 
-import java.util.Scanner;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.sql.SQLException;
 
-public class RegisterView {
+public class RegisterView extends JFrame {
+    private JTextField usernameField;
+    private JTextField cityField;
+    private JPasswordField passwordField;
+    private JComboBox<String> roleBox;
 
-    private final Scanner scanner = new Scanner(System.in);
-    private final UserService userService = new UserService(); // You may pass this from outside
+    public RegisterView() throws SQLException {
+        JLabel title = new JLabel("Register", SwingConstants.CENTER);
+        title.setFont(new Font("serif", Font.BOLD, 18));
+        add(title);
 
-    public void show() {
-        System.out.println("\n===== REGISTER =====");
-        System.out.println("[1] Register as Renter");
-        System.out.println("[2] Register as Lender");
-        System.out.print("➤ Choose account type: ");
+        setTitle("Register");
+        setSize(800, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
 
-        String choice = scanner.nextLine();
+       JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createEtchedBorder(),
+            "Signup Form",
+            TitledBorder.CENTER,
+            TitledBorder.TOP
+        ));
+        formPanel.setBackground(Color.WHITE);
 
-        switch (choice) {
-            case "1":
-                registerRenter();
-                break;
-            case "2":
-                registerLender();
-                break;
-            default:
-                System.out.println("❌ Invalid choice. Please try again.");
-        }
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+
+        int row = 0;
+        formPanel.add(createLabel("Username:"), gbcLabel(gbc, 0, row));
+        usernameField = new JTextField(15);
+        formPanel.add(usernameField, gbcField(gbc, 1, row++));
+
+        formPanel.add(createLabel("City:"), gbcLabel(gbc, 0, row));
+        cityField = new JTextField(15);
+        formPanel.add(cityField, gbcField(gbc, 1, row++));
+
+        formPanel.add(createLabel("Password:"), gbcLabel(gbc, 0, row));
+        passwordField = new JPasswordField(15);
+        formPanel.add(passwordField, gbcField(gbc, 1, row++));
+
+        formPanel.add(createLabel("Role:"), gbcLabel(gbc, 0, row));
+        roleBox = new JComboBox<>(new String[]{"Renter", "Lender"});
+        formPanel.add(roleBox, gbcField(gbc, 1, row++));
+
+        JButton registerBtn = new JButton("Register");
+        formPanel.add(registerBtn, gbcField(gbc, 0, row));
+
+        JButton backBtn = new JButton("Back");
+        formPanel.add(backBtn, gbcField(gbc, 1, row));
+
+        add(formPanel);
+
+
+        registerBtn.addActionListener((ActionEvent e) -> {
+            String username = usernameField.getText();
+            String city = cityField.getText();
+            String password = new String(passwordField.getPassword());
+            String role = (String) roleBox.getSelectedItem();
+
+            try {
+                if (role.equals("Renter")) {
+                    UserService renterService = new UserService();
+                    renterService.registerRenter(new Renter(username, city, password));
+                    JOptionPane.showMessageDialog(this, "Renter registered successfully!");
+                } else {
+                    UserService lenderService = new UserService();
+                    lenderService.registerLender(new Lender(username, city, password));
+                    JOptionPane.showMessageDialog(this, "Lender registered successfully!");
+                }
+                new MainMenu();
+                dispose();
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Registration error: " + ex.getMessage());
+            }
+        });
+
+        backBtn.addActionListener(e -> {
+            new MainMenu();
+            dispose();
+        });
+
+        setVisible(true);
+    }
+        private JLabel createLabel(String text) {
+        return new JLabel(text);
     }
 
-    private void registerRenter() {
-        System.out.println("\n--- RENTER REGISTRATION ---");
-        System.out.print("Username: ");
-        String username = scanner.nextLine();
-
-        System.out.print("Password: ");
-        String password = scanner.nextLine();
-
-        System.out.print("City: ");
-        String city = scanner.nextLine();
-
-        userService.registerRenter(username, password, city);
-        System.out.println("✅ Renter account created successfully!");
+    private GridBagConstraints gbcLabel(GridBagConstraints gbc, int x, int y) {
+        GridBagConstraints c = (GridBagConstraints) gbc.clone();
+        c.gridx = x;
+        c.gridy = y;
+        return c;
     }
 
-    private void registerLender() {
-        System.out.println("\n--- LENDER REGISTRATION ---");
-        System.out.print("Username: ");
-        String username = scanner.nextLine();
-
-        System.out.print("Password: ");
-        String password = scanner.nextLine();
-
-        System.out.print("City: ");
-        String city = scanner.nextLine();
-
-        userService.registerLender(username, password, city);
-        System.out.println("✅ Lender account created successfully!");
+    private GridBagConstraints gbcField(GridBagConstraints gbc, int x, int y) {
+        GridBagConstraints c = (GridBagConstraints) gbc.clone();
+        c.gridx = x;
+        c.gridy = y;
+        return c;
     }
+
 }
