@@ -9,8 +9,6 @@ Rent & Connect is a Java-based application that streamlines the rental process b
 - Java (OOP Principles)
 - Swing (for GUI)
 - JDBC (Database integration)
-- Threads (Background tasks)
-- RMI/Networking
 
 ---
 
