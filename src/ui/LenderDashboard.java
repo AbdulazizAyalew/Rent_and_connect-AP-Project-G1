@@ -172,29 +172,57 @@ public class LenderDashboard extends JFrame {
     buttonPanel.add(saveButton);
 
     saveButton.addActionListener(e -> {
-        try {
-            HouseListing house = new HouseListing();
-            house.setTitle(titleField.getText().trim());
-            house.setLocation((String) locationCombo.getSelectedItem());
-            house.setHouseType((String) typeCombo.getSelectedItem());
+    try {
+        String title = titleField.getText().trim();
+        String priceText = priceField.getText().trim();
+        String description = descriptionArea.getText().trim();
 
-            String priceText = priceField.getText().trim();
-            if (!priceText.isEmpty()) {
-                house.setPrice(new BigDecimal(priceText));
-            }
-
-            house.setAvailable(availableCheck.isSelected());
-            house.setDescription(descriptionArea.getText().trim());
-
-            boolean success = new HouseService().addHouse(house);
-            JOptionPane.showMessageDialog(dialog, success
-                    ? "House listing added successfully!"
-                    : "Failed to add house listing.");
-            if (success) dialog.dispose();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(dialog, "Error: " + ex.getMessage());
+        // Validate required fields
+        if (title.isEmpty()) {
+            JOptionPane.showMessageDialog(dialog, "Title cannot be empty.");
+            return;
         }
-    });
+        if (priceText.isEmpty()) {
+            JOptionPane.showMessageDialog(dialog, "Price cannot be empty.");
+            return;
+        }
+        if (description.isEmpty()) {
+            JOptionPane.showMessageDialog(dialog, "Description cannot be empty.");
+            return;
+        }
+
+        // Price validation: check if price is a valid number > 0
+        BigDecimal price;
+        try {
+            price = new BigDecimal(priceText);
+            if (price.compareTo(BigDecimal.ZERO) <= 0) {
+                JOptionPane.showMessageDialog(dialog, "Price must be greater than 0.");
+                return;
+            }
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(dialog, "Invalid price format.");
+            return;
+        }
+
+        HouseListing house = new HouseListing();
+        house.setTitle(title);
+        house.setLocation((String) locationCombo.getSelectedItem());
+        house.setHouseType((String) typeCombo.getSelectedItem());
+        house.setPrice(price);
+        house.setAvailable(availableCheck.isSelected());
+        house.setDescription(description);
+
+        boolean success = new HouseService().addHouse(house);
+        JOptionPane.showMessageDialog(dialog, success
+                ? "House listing added successfully!"
+                : "Failed to add house listing.");
+        if (success) dialog.dispose();
+
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(dialog, "Error: " + ex.getMessage());
+    }
+});
+
 
     cancelButton.addActionListener(e -> dialog.dispose());
 

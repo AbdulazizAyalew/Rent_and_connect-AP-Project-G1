@@ -10,7 +10,6 @@ public abstract class user {
         this.city = city;
     }
 
-    public abstract void displayHomePage();
 
     public String getUsername() { return username; }
     public String getPassword() { return password; }

@@ -4,8 +4,4 @@ public class Renter extends user {
         super(username, city, password);
     }
 
-    @Override
-    public void displayHomePage() {
-        System.out.println("Welcome, Renter " + getUsername());
-    }
 }
